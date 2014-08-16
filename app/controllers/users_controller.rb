@@ -30,6 +30,7 @@ class UsersController < ApplicationController
     state = params[:state]
 
     if state == session[:spotify_auth_state]
+      session.clear
       query_hash = {
         code: auth_code,
         redirect_uri: client_callback_url,
