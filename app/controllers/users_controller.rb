@@ -41,10 +41,27 @@ class UsersController < ApplicationController
 
       if response.code.to_i == 200
         token_data = JSON.parse(response.body)
-        render text: "#{token_data}"
+        profile_data = get_profile_data(token_data["access_token"])
+
+        render json: {token_data: token_data, profile_data: profile_data}
       end
     else
       redirect_to root
     end
+  end
+
+  private
+
+  def get_profile_data(access_token)
+    spotify_profile_endpoint = URI.parse("https://api.spotify.com")
+    
+    http = Net::HTTP.new(spotify_profile_endpoint.host, spotify_profile_endpoint.port)
+    http.use_ssl = true
+
+    request = Net::HTTP::Get.new("/v1/me")
+    request.add_field("Authorization", "Bearer " + access_token)
+    response = http.request(request)
+
+    return JSON.parse(response.body)
   end
 end
