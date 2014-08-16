@@ -21,4 +21,30 @@ class UsersController < ApplicationController
     url = 'https://accounts.spotify.com/authorize?' + query_hash.to_query
     redirect_to url
   end
+
+  def callback
+    client_callback_url = "http://localhost:3000/callback/"
+    client_id = ENV['CLIENT_ID']
+    client_secret = ENV['CLIENT_SECRET']
+    auth_code = params[:code]
+    state = params[:state]
+
+    if state == session[:spotify_auth_state]
+      query_hash = {
+        code: auth_code,
+        redirect_uri: client_callback_url,
+        grant_type: 'authorization_code',
+        client_id: client_id,
+        client_secret: client_secret
+      }
+      response = HTTParty.post('https://accounts.spotify.com/api/token', query: query_hash)
+
+      if response.code.to_i == 200
+        token_data = JSON.parse(response.body)
+        render text: "#{token_data}"
+      end
+    else
+      redirect_to root
+    end
+  end
 end

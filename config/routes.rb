@@ -7,6 +7,8 @@ Rails.application.routes.draw do
 
   resources :users, only: [:create]
 
+  get '/callback', to: 'users#callback'
+
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
 
