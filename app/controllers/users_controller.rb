@@ -2,6 +2,7 @@ class UsersController < ApplicationController
   
   def show
     @user = User.find_by_spotify_user_id(session[:spotify_user_id])
+    @tracks = get_user_tracks(session[:access_token])
   end
 
   def create
@@ -54,6 +55,7 @@ class UsersController < ApplicationController
           @user = User.create( spotify_user_id: profile_data["id"], refresh_token: token_data["refresh_token"])
         end
         session[:spotify_user_id] = profile_data["id"]
+        session[:access_token] = token_data["access_token"]
         redirect_to @user
       end
     else
@@ -75,4 +77,18 @@ class UsersController < ApplicationController
 
     return JSON.parse(response.body)
   end
+
+  def get_user_tracks(access_token)
+    spotify_profile_endpoint = URI.parse("https://api.spotify.com")
+    
+    http = Net::HTTP.new(spotify_profile_endpoint.host, spotify_profile_endpoint.port)
+    http.use_ssl = true
+
+    request = Net::HTTP::Get.new("/v1/me/tracks")
+    request.add_field("Authorization", "Bearer " + access_token)
+    response = http.request(request)
+
+    return JSON.parse(response.body)
+  end
+
 end
