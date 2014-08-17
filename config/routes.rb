@@ -5,7 +5,7 @@ Rails.application.routes.draw do
   # You can have the root of your site routed with "root"
   root 'pages#index'
 
-  resources :users, only: [:create]
+  resources :users, only: [:show, :create]
 
   get '/callback', to: 'users#callback'
 

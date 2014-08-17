@@ -1,4 +1,9 @@
 class UsersController < ApplicationController
+  
+  def show
+    @user = User.find_by_spotify_user_id(session[:spotify_user_id])
+  end
+
   def create
     client_id = ENV['CLIENT_ID']
     client_secret = ENV['CLIENT_SECRET']
@@ -48,7 +53,8 @@ class UsersController < ApplicationController
         else
           @user = User.create( spotify_user_id: profile_data["id"], refresh_token: token_data["refresh_token"])
         end
-        render :show
+        session[:spotify_user_id] = profile_data["id"]
+        redirect_to @user
       end
     else
       redirect_to root
