@@ -80,16 +80,32 @@ class UsersController < ApplicationController
   end
 
   def get_user_tracks(access_token)
+    tracks = { "items" => [] }
+
     spotify_profile_endpoint = URI.parse("https://api.spotify.com")
     
     http = Net::HTTP.new(spotify_profile_endpoint.host, spotify_profile_endpoint.port)
     http.use_ssl = true
 
-    request = Net::HTTP::Get.new("/v1/me/tracks")
-    request.add_field("Authorization", "Bearer " + access_token)
-    response = http.request(request)
+    path = "/v1/me/tracks"
 
-    return JSON.parse(response.body)
+    while path
+      request = Net::HTTP::Get.new(path)
+      request.add_field("Authorization", "Bearer " + access_token)
+      response = http.request(request)
+      parsed_response = JSON.parse(response.body)
+      print "\n" *12
+      tracks["items"].concat(parsed_response.delete("items"))
+      tracks.merge!(parsed_response)
+      p path
+      path = if parsed_response["next"]
+        parsed_response["next"].gsub("https://api.spotify.com", '')
+      else
+        nil
+      end
+    end
+
+    return tracks
   end
 
   def aggregate_artists(tracks)
