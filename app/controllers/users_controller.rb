@@ -43,8 +43,12 @@ class UsersController < ApplicationController
       if response.code.to_i == 200
         token_data = JSON.parse(response.body)
         profile_data = get_profile_data(token_data["access_token"])
-
-        render json: {token_data: token_data, profile_data: profile_data}
+        if @user = User.find_by_spotify_user_id(profile_data["id"])
+          @user.update_attributes( refresh_token: token_data["refresh_token"])
+        else
+          @user = User.create( spotify_user_id: profile_data["id"], refresh_token: token_data["refresh_token"])
+        end
+        render :show
       end
     else
       redirect_to root
