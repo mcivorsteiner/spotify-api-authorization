@@ -3,6 +3,7 @@ class UsersController < ApplicationController
   def show
     @user = User.find_by_spotify_user_id(session[:spotify_user_id])
     @tracks = get_user_tracks(session[:access_token])
+    @artists = aggregate_artists(@tracks)
   end
 
   def create
@@ -89,6 +90,21 @@ class UsersController < ApplicationController
     response = http.request(request)
 
     return JSON.parse(response.body)
+  end
+
+  def aggregate_artists(tracks)
+    top_artists = {}
+    artist_cache = {}
+    tracks["items"].each do |item|
+      item["track"]["artists"].each do |artist|
+        unless top_artists.has_key?(artist["uri"])
+          top_artists[artist["uri"]] = 0
+          artist_cache[artist["uri"]] = artist
+        end
+        top_artists[artist["uri"]] += 1
+      end
+    end
+    { top_artists: top_artists, artist_cache: artist_cache }
   end
 
 end
