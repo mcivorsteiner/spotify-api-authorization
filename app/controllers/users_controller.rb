@@ -32,12 +32,18 @@ class UsersController < ApplicationController
           @user = User.create( spotify_user_id: profile_data["id"], refresh_token: token_data["refresh_token"])
         end
 
-        session[:id] = @user.id
+        session[:user_id] = @user.id
         session[:access_token] = token_data["access_token"]
         redirect_to @user
       end
     else
       redirect_to root
     end
+  end
+
+  def refresh
+    @user = User.find(session[:user_id])
+    auth_client = SpotifyAuth.new
+    auth_client.request_token_refresh(@user.refresh_token)
   end
 end

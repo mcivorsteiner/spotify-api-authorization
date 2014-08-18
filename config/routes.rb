@@ -9,6 +9,8 @@ Rails.application.routes.draw do
 
   get '/callback', to: 'users#callback'
 
+  post '/refresh', to: 'users#refresh'
+
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
 

@@ -32,4 +32,19 @@ class SpotifyAuth
 
     self.class.post('/api/token', query: query_hash)
   end
+
+  def request_token_refresh(refresh_token)
+    query_hash = {
+      grant_type: "refresh_token",
+      refresh_token: refresh_token
+    }
+
+    self.class.post("/api/token", query: query_hash, headers: { "Authorization" => auth_header })
+  end
+
+  private
+
+  def auth_header
+    "Basic " + Base64.strict_encode64(@client_id + ":" + @client_secret)
+  end
 end
