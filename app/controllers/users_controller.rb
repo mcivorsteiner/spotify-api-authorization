@@ -44,6 +44,6 @@ class UsersController < ApplicationController
   def refresh
     @user = User.find(session[:user_id])
     auth_client = SpotifyAuth.new
-    auth_client.request_token_refresh(@user.refresh_token)
+    render json: auth_client.request_token_refresh(@user.refresh_token)
   end
 end

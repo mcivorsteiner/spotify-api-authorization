@@ -22,7 +22,7 @@ class SpotifyClient
     path = "/v1/me/tracks"
 
     while path
-      response = request(path, headers: { "Authorization" => "Bearer #{@access_token}" })
+      response = request(path, headers: { "Authorization" => "Bearer #{@access_token}" }, query: { "limit" => 50 })
       tracks["items"].concat(response.delete("items"))
       tracks.merge!(response)
       path = response["next"] ? response["next"].gsub("https://api.spotify.com", "") : nil
