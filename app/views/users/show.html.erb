@@ -1,4 +1,7 @@
 <h2>Profile Page</h2>
-<%= @user.spotify_user_id %><br>
-<%= @user.refresh_token %><br>
-<%= @artists %>
+<h4>Your Artists From Spotify:</h4>
+<ul>
+  <% @artists[:artist_cache].each do |artist_uri, artist_hash| %>
+    <li><%= artist_hash["name"] %></li>
+  <% end %>
+</ul>

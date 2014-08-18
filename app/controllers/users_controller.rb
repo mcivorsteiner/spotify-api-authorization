@@ -94,10 +94,8 @@ class UsersController < ApplicationController
       request.add_field("Authorization", "Bearer " + access_token)
       response = http.request(request)
       parsed_response = JSON.parse(response.body)
-      print "\n" *12
       tracks["items"].concat(parsed_response.delete("items"))
       tracks.merge!(parsed_response)
-      p path
       path = if parsed_response["next"]
         parsed_response["next"].gsub("https://api.spotify.com", '')
       else
@@ -112,13 +110,12 @@ class UsersController < ApplicationController
     top_artists = {}
     artist_cache = {}
     tracks["items"].each do |item|
-      item["track"]["artists"].each do |artist|
-        unless top_artists.has_key?(artist["uri"])
-          top_artists[artist["uri"]] = 0
-          artist_cache[artist["uri"]] = artist
-        end
-        top_artists[artist["uri"]] += 1
+      artist = item["track"]["artists"].first
+      unless top_artists.has_key?(artist["uri"])
+        top_artists[artist["uri"]] = 0
+        artist_cache[artist["uri"]] = artist
       end
+      top_artists[artist["uri"]] += 1
     end
     { top_artists: top_artists, artist_cache: artist_cache }
   end
